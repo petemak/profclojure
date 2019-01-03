@@ -32,3 +32,5 @@ Web Services. Utilising coljure features e.g. expressivenes, immutable data stru
 * Project structure with the *compojure* template: _lein new compojure <project name>_
 * *Ring* for HTTP abstraction
 * *Compojure* for routing
+* *example-project* works through *ring* and *compojure* concepts
+* *ring-shortener* summary project for CH3 
