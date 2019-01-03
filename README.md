@@ -25,3 +25,10 @@ Rapid feedback cycles.
 * REPL - connecting to server with _lein repl :connect localhost:xxxxx_
 * REPL - embedding REPL is server application with _lein-ring_ plugin and _:nrepl {:start? true}..._
 * REPL - code reload with _org.clojure/tools.namespace_ and _:reload_
+
+
+## ch3
+Web Services. Utilising coljure features e.g. expressivenes, immutable data structures, concurrency and re-use to easily create web services.
+* Project structure with the *compojure* template: _lein new compojure <project name>_
+* *Ring* for HTTP abstraction
+* *Compojure* for routing
