@@ -6,7 +6,7 @@
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]]
   :plugins [[lein-ring "0.12.4"]]
-  :ring {:handler link-shortener.handler/app}
+  :ring {:handler link-shortener.application/main-handler}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})
