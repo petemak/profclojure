@@ -4,7 +4,8 @@
             [link-shortener.handler :refer :all]
             [link-shortener.storage :as stg-api]
             [link-shortener.storage.in-memory :as stg-impl]
-            [ring.mock.request :as mock]))
+            [ring.mock.request :as mock]
+            [cheshire.core :as json]))
 
 (deftest retrieve-link-test
   (testing "The link retrieval handler"
@@ -94,13 +95,35 @@
              (is (= (:status response) 200))
              (testing "and the body must contain the URL"
                (is (= (:body response) url))               
-               (testing "and that once deleted, then indeed deleted then the id does not exist"
+               (testing "and that once deleted, then indeed deleted 
+                         then the id does not exist"
                  (let [response (retrieve-link strg id)] 
                    (is (= (:status response) 404))))))))
 
       (testing "when an unregistered id is specified"
         (let [response (delete-link strg "invalid-id")] 
            (testing "then the response must be 404 OK"
-             (is (= (:status response) 422))))))))
+             (is (= (:status response) 404))))))))
+
+
+(deftest retrieve-all-links-test
+  (testing "Tesing retrieval of the list of links"
+    (let [id-urls {"id1" "https://some.link1.com/path1"
+                   "id2" "https://some.link2.com/path2"
+                   "id3" "https://some.link3.com1/path3"}
+          strg (stg-impl/get-mem-storage)]
+      
+      (doseq [[id url ] id-urls]
+         (stg-api/create-link strg id url))
+
+      (testing "when links exist "
+        (let [handler (retrieve-all-links strg)
+              response (handler (mock/request :get "/links"))
+              links (json/decode (:body response))]
+          (testing "Then response code must be 200"
+            (is (= (:status response) 200))
+
+            (testing "and the results in the respond body must equal original map"
+              (= links id-urls))) )))))
 
 
