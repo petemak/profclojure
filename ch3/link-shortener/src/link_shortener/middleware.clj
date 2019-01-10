@@ -2,8 +2,7 @@
   (:import java.io.InputStream))
 
 ;;
-;; Middleware slurps the requsrt body
-
+;; Middleware slurps the request body
 (defn wrap-slurp-body
   "The request body is provided as a java InputStream, this middleware will
   retunr a handler function that slurps the body and replaces it with a string

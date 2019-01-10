@@ -1,5 +1,6 @@
 (ns link-shortener.application
   (:require [link-shortener.routes :as routes]
+            [link-shortener.storage.in-memory :refer [get-mem-storage]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults secure-api-defaults]]))
 
 
@@ -17,6 +18,11 @@
 ;;                    antiforgery tokens and cross-site scripting protection .
 ;; 3) secure-api-defaults - see next.
 ;; 4) secure-site-defaults - force SSL and various headers, flags are set to prevent
-;;                           the browser sending sensitive information over insecure channels.
-(def main-handler
-  (wrap-defaults routes/app-routes api-defaults))
+;;                           the browser sending sensitive information over
+;;                           insecure channels.
+;;
+(def app-handler
+  (let [stg (get-mem-storage)
+        shortener-routes (routes/shortener-routes stg)]
+    (wrap-defaults shortener-routes api-defaults)))
+
