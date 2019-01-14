@@ -6,17 +6,13 @@
             [compojure.core :refer :all]))
 
 
-;; Defines all endpoints that the services will provide
-(defroutes app-routes
-  (GET "/" [] "Link Shortner - v0.0.1")
-  (route/not-found "Invalid request!"))
-
-
-
 ;;
 (defn shortener-routes
-  [stg]
+  [strg]
   (-> (routes
-       (POST "/links/:id" [id :as request] (handler/register-link stg id request))
+       (GET  "/links/:id" [id] (handler/retrieve-link strg id))
+       (POST "/links/:id" [id :as request] (handler/register-link strg id request))
+       (PUT  "/links/:id" [id :as request] (handler/update-link strg id request))
+       (DELETE "links/:id" [id] (handler/delete-link strg id))
        (route/not-found "Not Found"))
       (wrap-routes middleware/wrap-slurp-body)))

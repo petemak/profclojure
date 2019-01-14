@@ -25,4 +25,3 @@
   (let [stg (get-mem-storage)
         shortener-routes (routes/shortener-routes stg)]
     (wrap-defaults shortener-routes api-defaults)))
-

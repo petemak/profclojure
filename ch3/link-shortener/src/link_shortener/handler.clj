@@ -42,10 +42,12 @@
 ;;
 (defn retrieve-link
   "Reads the link associated with the provided id and redirects ot it. 
-  Otherwise retunrs a 4040 response"
+  Otherwise retunrs a 404 response"
   [strg id]
   (if-let [url (strg-api/get-link strg id)]
-    (res/redirect url)
+    (do
+     (println "********[" strg "]***[" id "]****[" url "]********")
+     (res/redirect url))
     (res/not-found (str "Link for -[" id "]- was not found!"))))
 
 
