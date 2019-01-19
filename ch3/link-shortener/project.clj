@@ -6,7 +6,8 @@
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-json "0.4.0"]
-                 [cheshire "5.8.1"]]
+                 [cheshire "5.8.1"]
+                 [environ "1.1.0"]]
   :plugins [[lein-ring "0.12.4"]]
   :ring {:handler link-shortener.application/app-handler}
   :profiles

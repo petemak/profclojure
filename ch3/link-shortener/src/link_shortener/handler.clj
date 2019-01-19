@@ -2,7 +2,7 @@
   (:require [ring.util.request :as req]
             [ring.util.response :as res]
             [ring.middleware.json :refer [wrap-json-response]]
-            [link-shortener.storage :as strg-api]            ))
+            [link-shortener.storage :as strg-api]))
 
 
 
@@ -38,6 +38,13 @@
         (res/response)
         (res/status 404))))
 
+;; This deletes all entries
+(defn delete-links
+  "Clear storage of all links"
+  [strg]
+  (strg-api/delete-links strg)
+  (res/response ""))
+
 
 ;;
 (defn retrieve-link
@@ -45,9 +52,7 @@
   Otherwise retunrs a 404 response"
   [strg id]
   (if-let [url (strg-api/get-link strg id)]
-    (do
-     (println "********[" strg "]***[" id "]****[" url "]********")
-     (res/redirect url))
+    (res/redirect url)
     (res/not-found (str "Link for -[" id "]- was not found!"))))
 
 
@@ -59,3 +64,5 @@
  (wrap-json-response
   (fn [req]
     (res/response (strg-api/get-links strg)))))
+
+

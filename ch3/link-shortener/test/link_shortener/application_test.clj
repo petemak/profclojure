@@ -1,8 +1,18 @@
 (ns link-shortener.application-test
   (:require [link-shortener.application :refer :all]
             [clojure.test :refer :all]
-            [ring.mock.request :as mock]))
+            [ring.mock.request :as mock]
+            [cheshire.core :as json]))
 
+;; Fixture ensures the storage is cleared
+;; before each test
+(defn storage-fixture
+  "Will clean storage before test runs"
+  [f]
+  (app-handler (mock/request :delete "/links"))
+  (f))
+
+(use-fixtures :each storage-fixture)
 
 (deftest test-app
   (testing "application error routes"
@@ -20,7 +30,7 @@
 
 ;;
 (deftest test-post-post
-  (testing "Testing actual application routes"
+  (testing "Testing post route for registerringlinks"
     (let [id "test-put-001"
           url "https://clojure.org"
           path (str "/links/" id)
@@ -35,7 +45,7 @@
 
 
 (deftest test-get-route
-  (testing "Testing actual application routes"
+  (testing "Testing get route for retrieving links"
     (let [id "test-get-001"
           url "https://clojure.org"
           path (str "/links/" id)] 
@@ -57,7 +67,7 @@
 
 
 (deftest test-put-route
-  (testing "Testing actual application routes"
+  (testing "Testing put route for modifing links"
     (let [id "test-put-001"         
           url "https://clojure.org"
           new-url "https://clojurescript.org"
@@ -78,18 +88,19 @@
 
 
 
-(deftest test-delete-route
-  (testing "Testing actual application routes"
+(deftest test-delete-link-route
+  (testing "Testing delete route for unregistering links"
     (let [id "test-delete-001"         
           url "https://clojure.org"
           path (str "/links/" id)] 
 
       (testing "DELETE /links/:id"
         (testing "when the id exsists"
-          (app-handler (mock/request :post  path url))
+          (app-handler (mock/request :post path url))
           (let [response (app-handler (mock/request :delete path))]
-            (testing "that the responce code is 204"
-              (is (= (:status response) 204))
+            (testing "that the response code is 200"
+              (is (= (:status response) 200))
+              (is (= (:body response) url))
               (testing "and the link now returns a 404"
                 (let [response (app-handler (mock/request :get path))]
                   (is (= (:status response) 404)))))))
@@ -99,3 +110,48 @@
             (testing "that the response status code is 404 unknown"
               (is (= (:status response) 404)))))))))
 
+
+
+(deftest test-delete-links-route
+  (testing "Testing delete route for unregistering links"
+    (let [id-urls {"test-del-all-001" "https://clojure.org/1"
+                   "test-del-all-002" "https://clojure.org/2"
+                   "test-del-all-003" "https://clojure.org/3"}
+          resp (doseq [[id url] id-urls]
+                 (app-handler (mock/request :post (str "/links/" id) url)))] 
+
+      (testing "DELETE /links"
+        (let [response (app-handler (mock/request :delete "/links"))]
+          (testing "after delete that the response code is 200"
+            (is (= (:status response) 200))))
+        
+        (let [response (app-handler (mock/request :get (str "/links")))
+              decoded-body (json/decode (:body response))]
+          (testing "after deletion, rtrieving all links"
+            (testing "that the response status code is 200 success"
+              (is (= (:status response) 200)))
+            (testing "that the results are empty"
+              (is (empty? decoded-body)))))))))
+
+
+
+(deftest test-get-all-links
+  (testing "Testing get route for retrieving all routes"
+    (let [id-urls {"test-get-all-001" "https://clojure.org/1"
+                   "test-get-all-002" "https://clojure.org/2"
+                   "test-get-all-003" "https://clojure.org/3"}
+          resp (doseq [[id url] id-urls]
+                 (app-handler (mock/request :post (str "/links/" id) url)))]
+
+      
+      (testing "GET /links"
+        (testing "when the ids exists"
+          (let [response (app-handler (mock/request :get "/links"))
+                decoded-body (json/decode (:body response))]
+
+            (testing "that the response status code is 200 success"
+              (is (= (:status response) 200))
+              (testing "and that the location contains the expected URL"
+                (is (= (select-keys decoded-body ["test-get-all-001"
+                                                  "test-get-all-002"
+                                                  "test-get-all-003"]) id-urls))))))))))

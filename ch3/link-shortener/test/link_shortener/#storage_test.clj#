@@ -75,8 +75,7 @@
                       "del-id2" "https://xyz.example.com/id2"
                       "del-id3" "https://xyz.example.com/id3"}
           ids (doseq [[an-id a-url] id-url-map]
-                (create-link strg an-id a-url))
-          ]
+                (create-link strg an-id a-url))]
       (testing "that deleting all clears the storage"
         (let [links (get-links strg)] 
           (is (= (count links) 3))

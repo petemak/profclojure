@@ -26,7 +26,7 @@
         (swap! strg-atom dissoc id)
         url)))
 
-  (reset [this]
+  (delete-links [this]
     (swap! strg-atom empty))
   
   (get-link [this id]
