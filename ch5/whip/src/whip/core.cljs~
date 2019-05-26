@@ -1,0 +1,52 @@
+(ns whip.core
+  (:require [reagent.core :as reagent :refer [atom]]
+            [whip.view.navbar :as navbar]
+            [whip.view.story :as story]))
+
+(enable-console-print!)
+
+
+;; define your app data so that it doesn't get over-written on reload
+(defonce app-state (reagent/atom
+                    {:projects
+                     {"prj001" {:title "Build Project  Manager"
+                                :stories {1 {:title "Design data model for stories"
+                                             :status "open"
+                                             :order 1}
+                                          2 {:title "Design UI"
+                                             :status "open"
+                                             :order 2}
+                                          3 {:title "Define project structure"
+                                             :status "open"}}} 
+                      "prj002"  {:tile "Build Task Manager front end"
+                                 :stories {}}}}))
+
+  (println (str  ":: whip.core ==>[" @app-state "]<=="))
+
+  (defn hello-world
+    []
+    [:div
+     [:h1 (:text @app-state)]
+     [:h3 "Edit this and watch it change!"] 
+     [:hr]])
+
+
+  
+  (defn app-ui []
+    [:div.content
+     [:div.header
+      [navbar/nav-bar app-state]]
+     [:div.main 
+      [story/render-stories app-state "prj001"]]
+     [:div.footer
+      {:style {:font-family "fantasy"}}
+      [:center "~ All Credits to Professional Clojure - ISBN 978-1-119-26727-0 ~"]]])
+
+  (reagent/render-component [app-ui]
+                            (. js/document (getElementById "app")))
+
+  (defn on-js-reload []
+    ;; optionally touch your app-state to force rerendering depending on
+    ;; your application
+    ;; (swap! app-state update-in [:__figwheel_counter] inc)
+    )

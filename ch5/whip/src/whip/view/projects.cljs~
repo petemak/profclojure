@@ -1,0 +1,2 @@
+(ns whip.view.project-list
+  (:require [reagent.core :as reagent]))
